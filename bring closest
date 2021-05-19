@@ -1,0 +1,41 @@
+_G.z = true
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function GetClosestEnemyChar()
+    local Character = LocalPlayer.Character
+    local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+    if not (Character or HumanoidRootPart) then return end
+
+    local TargetDistance = math.huge
+    local Target
+
+    for i,v in ipairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+            if v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 and not v.Character:FindFirstChild("ForceField") then
+                local TargetHRP = v.Character.HumanoidRootPart
+                local mag = (HumanoidRootPart.Position - TargetHRP.Position).magnitude
+                if mag < TargetDistance then
+                    TargetDistance = mag
+                    Target = v
+                end
+            end
+        end
+    end
+
+    return Target.Character
+end
+
+while game.RunService.RenderStepped:Wait() and _G.z do 
+    local LPChar = game.Players.LocalPlayer.Character
+    if LPChar then
+        local LPhum = LPChar:FindFirstChild("HumanoidRootPart")
+        if LPhum then
+            local char = GetClosestEnemyChar()
+            if char then
+                char.HumanoidRootPart.CFrame = LPhum.CFrame * CFrame.new(0,0,-10)
+            end
+        end
+    end
+end
